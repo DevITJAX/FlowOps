@@ -1,17 +1,13 @@
 name: CD Pipeline
 
 on:
-  workflow_run:
-    workflows: ["CI Pipeline"]
+  push:
     branches: [main]
-    types:
-      - completed
 
 jobs:
   deploy:
     name: Deploy to Azure
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     
     steps:
       - name: Checkout code
