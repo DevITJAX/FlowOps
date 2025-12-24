@@ -4,7 +4,11 @@ const {
     getProject,
     createProject,
     updateProject,
-    deleteProject
+    deleteProject,
+    getMembers,
+    addMember,
+    removeMember,
+    getAvailableUsers
 } = require('../controllers/projects');
 const { protect } = require('../middleware/auth');
 
@@ -27,5 +31,11 @@ router
     .get(getProject)
     .put(updateProject)
     .delete(deleteProject);
+
+// Team member management
+router.get('/:id/members', getMembers);
+router.post('/:id/members', addMember);
+router.delete('/:id/members/:userId', removeMember);
+router.get('/:id/available-users', getAvailableUsers);
 
 module.exports = router;

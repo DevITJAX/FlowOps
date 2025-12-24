@@ -36,7 +36,12 @@ export const projectsAPI = {
     getOne: (id) => api.get(`/projects/${id}`),
     create: (data) => api.post('/projects', data),
     update: (id, data) => api.put(`/projects/${id}`, data),
-    delete: (id) => api.delete(`/projects/${id}`)
+    delete: (id) => api.delete(`/projects/${id}`),
+    // Team member management
+    getMembers: (id) => api.get(`/projects/${id}/members`),
+    addMember: (id, data) => api.post(`/projects/${id}/members`, data),
+    removeMember: (id, userId) => api.delete(`/projects/${id}/members/${userId}`),
+    getAvailableUsers: (id) => api.get(`/projects/${id}/available-users`)
 };
 
 export const tasksAPI = {
@@ -92,6 +97,30 @@ export const sprintsAPI = {
     removeTasks: (id, taskIds) => api.delete(`/sprints/${id}/tasks`, { data: { taskIds } }),
     getBacklog: (projectId) => api.get(`/projects/${projectId}/sprints/backlog`),
     getVelocity: (projectId, limit) => api.get(`/projects/${projectId}/sprints/velocity?limit=${limit || 5}`)
+};
+
+export const issueLinksAPI = {
+    getByTask: (taskId) => api.get(`/tasks/${taskId}/links`),
+    create: (taskId, data) => api.post(`/tasks/${taskId}/links`, data),
+    delete: (id) => api.delete(`/links/${id}`)
+};
+
+export const attachmentsAPI = {
+    getByTask: (taskId) => api.get(`/tasks/${taskId}/attachments`),
+    upload: (taskId, formData) => api.post(`/tasks/${taskId}/attachments`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    download: (id) => `http://localhost:3001/api/attachments/${id}/download`,
+    delete: (id) => api.delete(`/attachments/${id}`)
+};
+
+export const notificationsAPI = {
+    getAll: (limit = 20) => api.get(`/notifications?limit=${limit}`),
+    getUnread: () => api.get('/notifications?unread=true'),
+    markAsRead: (id) => api.put(`/notifications/${id}/read`),
+    markAllAsRead: () => api.put('/notifications/read-all'),
+    delete: (id) => api.delete(`/notifications/${id}`),
+    clearRead: () => api.delete('/notifications/clear')
 };
 
 export default api;

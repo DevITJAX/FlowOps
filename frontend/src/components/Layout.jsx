@@ -42,6 +42,11 @@ const Layout = () => {
                             <i className="bi bi-kanban me-2"></i> Board
                         </Link>
                     </li>
+                    <li>
+                        <Link to="/team" className={`nav-link ${isActive('/team')}`}>
+                            <i className="bi bi-people me-2"></i> Team
+                        </Link>
+                    </li>
                 </ul>
                 <hr />
                 <div className="dropdown">

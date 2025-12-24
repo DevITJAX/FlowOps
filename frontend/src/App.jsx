@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
 import Backlog from './pages/Backlog';
+import Team from './pages/Team';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -38,6 +39,7 @@ function App() {
             <Route path="projects" element={<Projects />} />
             <Route path="backlog" element={<Backlog />} />
             <Route path="tasks" element={<Tasks />} />
+            <Route path="team" element={<Team />} />
           </Route>
         </Routes>
       </AuthProvider>

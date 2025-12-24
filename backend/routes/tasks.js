@@ -14,6 +14,8 @@ const router = express.Router({ mergeParams: true });
 // Re-route nested resources
 router.use('/:taskId/comments', require('./comments'));
 router.use('/:taskId/timelogs', require('./timelogs'));
+router.use('/:taskId/links', require('./issueLinks'));
+router.use('/:taskId/attachments', require('./attachments'));
 
 router.use(protect);
 
