@@ -1,0 +1,903 @@
+% ============================================
+% RAPPORT DE PROJET - FlowOps
+% Application de Gestion de Projets MERN Stack
+% ============================================
+
+\documentclass[12pt,a4paper,french]{report}
+
+% ============================================
+% PACKAGES
+% ============================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tikz}
+
+% ============================================
+% CONFIGURATION
+% ============================================
+\geometry{margin=2.5cm}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    urlcolor=blue!70!black,
+    citecolor=green!50!black
+}
+
+% Style pour le code
+\definecolor{codebg}{RGB}{245,245,245}
+\definecolor{codegreen}{RGB}{0,128,0}
+\definecolor{codegray}{RGB}{128,128,128}
+\definecolor{codepurple}{RGB}{128,0,128}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{codebg},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    frame=single,
+    rulecolor=\color{gray!30}
+}
+\lstset{style=mystyle}
+
+% En-têtes et pieds de page
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{FlowOps}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ============================================
+% DÉBUT DU DOCUMENT
+% ============================================
+\begin{document}
+
+% ============================================
+% REMERCIEMENTS
+% ============================================
+\chapter*{Remerciements}
+\addcontentsline{toc}{chapter}{Remerciements}
+
+% TODO: Personnaliser les remerciements
+Je tiens à exprimer ma sincère gratitude envers toutes les personnes qui ont contribué à la réalisation de ce projet.
+
+Je remercie particulièrement [Nom de l'encadrant] pour son encadrement, ses conseils précieux et sa disponibilité tout au long de ce projet.
+
+Mes remerciements vont également à [Nom de l'institution/entreprise] pour m'avoir offert l'opportunité de réaliser ce travail dans les meilleures conditions.
+
+Enfin, je remercie ma famille et mes amis pour leur soutien constant et leurs encouragements.
+
+\vspace{2cm}
+\hfill \textit{[Votre nom]}
+
+\newpage
+
+% ============================================
+% TABLE DES MATIÈRES
+% ============================================
+\tableofcontents
+\newpage
+
+% ============================================
+% LISTE DES FIGURES
+% ============================================
+\listoffigures
+\addcontentsline{toc}{chapter}{Liste des figures}
+\newpage
+
+% ============================================
+% LISTE DES TABLEAUX
+% ============================================
+\listoftables
+\addcontentsline{toc}{chapter}{Liste des tableaux}
+\newpage
+
+% ============================================
+% INTRODUCTION GÉNÉRALE
+% ============================================
+\chapter*{Introduction Générale}
+\addcontentsline{toc}{chapter}{Introduction Générale}
+
+Dans un contexte où la transformation numérique s'impose comme un levier stratégique pour les entreprises, la gestion efficace des projets devient un enjeu majeur. Les équipes ont besoin d'outils collaboratifs permettant de suivre l'avancement des tâches, d'assigner les responsabilités et de maintenir une vision globale des projets en cours.
+
+C'est dans ce contexte que s'inscrit le projet \textbf{FlowOps}, une application web de gestion de projets moderne développée avec la stack MERN (MongoDB, Express.js, React, Node.js). Cette solution vise à fournir aux équipes un outil intuitif et performant pour organiser leur travail à travers une interface de type Kanban.
+
+\section*{Problématique}
+
+Comment concevoir et développer une application web de gestion de projets qui soit à la fois performante, sécurisée et facile à utiliser, tout en respectant les bonnes pratiques DevOps modernes ?
+
+\section*{Objectifs du projet}
+
+Les principaux objectifs de ce projet sont :
+\begin{itemize}
+    \item Développer une API RESTful robuste avec Express.js et MongoDB
+    \item Créer une interface utilisateur moderne et responsive avec React et Bootstrap 5
+    \item Implémenter un système d'authentification sécurisé basé sur JWT
+    \item Mettre en place une architecture microservices conteneurisée avec Docker
+    \item Automatiser le déploiement via un pipeline CI/CD avec GitHub Actions
+\end{itemize}
+
+\section*{Organisation du rapport}
+
+Ce rapport est organisé comme suit :
+\begin{itemize}
+    \item \textbf{Chapitre 1} : Présente le contexte général et la problématique du projet
+    \item \textbf{Chapitre 2} : Expose l'état de l'art et les technologies utilisées
+    \item \textbf{Chapitre 3} : Détaille la conception et l'architecture de l'application
+    \item \textbf{Chapitre 4} : Décrit la réalisation et l'implémentation
+    \item \textbf{Chapitre 5} : Présente les tests et la validation du système
+\end{itemize}
+
+\newpage
+
+% ============================================
+% CHAPITRE 1 : CONTEXTE ET PROBLÉMATIQUE
+% ============================================
+\chapter{Contexte et Problématique}
+
+\section{Présentation du contexte}
+
+La gestion de projets est une discipline essentielle dans le monde professionnel moderne. Avec la multiplication des projets et la diversification des équipes, disposer d'un outil centralisé devient indispensable pour :
+\begin{itemize}
+    \item Coordonner les efforts des différents membres de l'équipe
+    \item Suivre l'avancement des tâches en temps réel
+    \item Respecter les délais et les priorités
+    \item Maintenir une communication efficace
+\end{itemize}
+
+\section{Étude de l'existant}
+
+Plusieurs solutions de gestion de projets existent sur le marché :
+
+\begin{table}[H]
+\centering
+\caption{Comparaison des solutions existantes}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Solution} & \textbf{Open Source} & \textbf{Self-hosted} & \textbf{Kanban} & \textbf{Prix} \\
+\hline
+Jira & Non & Oui & Oui & Payant \\
+\hline
+Trello & Non & Non & Oui & Freemium \\
+\hline
+Asana & Non & Non & Oui & Freemium \\
+\hline
+OpenProject & Oui & Oui & Oui & Gratuit \\
+\hline
+\textbf{FlowOps} & \textbf{Oui} & \textbf{Oui} & \textbf{Oui} & \textbf{Gratuit} \\
+\hline
+\end{tabular}
+\label{tab:comparaison}
+\end{table}
+
+\section{Problématique}
+
+Malgré l'existence de nombreuses solutions, plusieurs défis persistent :
+\begin{enumerate}
+    \item \textbf{Coût} : Les solutions propriétaires peuvent être onéreuses
+    \item \textbf{Complexité} : Certains outils offrent trop de fonctionnalités superflues
+    \item \textbf{Personnalisation} : Difficultés à adapter les outils aux besoins spécifiques
+    \item \textbf{Hébergement} : Dépendance à des services cloud externes
+\end{enumerate}
+
+\section{Solution proposée}
+
+FlowOps répond à ces problématiques en proposant une application :
+\begin{itemize}
+    \item \textbf{Open source} et gratuite
+    \item \textbf{Légère} et focalisée sur l'essentiel
+    \item \textbf{Auto-hébergeable} via Docker
+    \item \textbf{Moderne} avec une stack technologique actuelle
+\end{itemize}
+
+\newpage
+
+% ============================================
+% CHAPITRE 2 : ÉTAT DE L'ART
+% ============================================
+\chapter{État de l'Art et Technologies}
+
+\section{Méthodologies de gestion de projets}
+
+\subsection{Méthode Agile}
+L'agilité est une approche de gestion de projets qui privilégie la flexibilité, la collaboration et les livraisons itératives. Les principaux frameworks agiles incluent Scrum, Kanban et XP (Extreme Programming).
+
+\subsection{Méthode Kanban}
+Kanban est une méthode visuelle de gestion du flux de travail. Elle utilise un tableau divisé en colonnes représentant les différentes étapes du processus (À faire, En cours, Terminé). Cette méthode est particulièrement adaptée à FlowOps.
+
+\section{Stack MERN}
+
+La stack MERN est un ensemble de technologies JavaScript permettant de développer des applications web full-stack :
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=2cm, every node/.style={rectangle, draw, minimum width=3cm, minimum height=1cm, align=center}]
+    \node (mongo) at (0,0) {\textbf{MongoDB}\\Base de données};
+    \node (express) at (4,0) {\textbf{Express.js}\\Backend API};
+    \node (react) at (8,0) {\textbf{React}\\Frontend UI};
+    \node (node) at (4,-2) {\textbf{Node.js}\\Runtime JavaScript};
+    
+    \draw[->] (mongo) -- (express);
+    \draw[->] (express) -- (react);
+    \draw[->] (node) -- (express);
+\end{tikzpicture}
+\caption{Architecture de la stack MERN}
+\label{fig:mern-stack}
+\end{figure}
+
+\subsection{MongoDB}
+MongoDB est une base de données NoSQL orientée documents. Elle stocke les données sous forme de documents JSON-like (BSON), offrant une grande flexibilité pour les schémas de données.
+
+\textbf{Avantages :}
+\begin{itemize}
+    \item Schéma flexible
+    \item Scalabilité horizontale
+    \item Requêtes puissantes avec l'agrégation
+    \item Intégration native avec JavaScript
+\end{itemize}
+
+\subsection{Express.js}
+Express.js est un framework web minimaliste pour Node.js. Il facilite la création d'APIs RESTful et la gestion des middlewares.
+
+\subsection{React}
+React est une bibliothèque JavaScript développée par Facebook pour construire des interfaces utilisateur. Elle utilise un DOM virtuel pour optimiser les performances de rendu.
+
+\subsection{Node.js}
+Node.js est un environnement d'exécution JavaScript côté serveur, basé sur le moteur V8 de Chrome. Il permet d'unifier le langage de développement entre le frontend et le backend.
+
+\section{Technologies complémentaires}
+
+\begin{table}[H]
+\centering
+\caption{Technologies utilisées dans FlowOps}
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Catégorie} & \textbf{Technologie} & \textbf{Rôle} \\
+\hline
+Build & Vite & Outil de build rapide pour React \\
+\hline
+UI & Bootstrap 5 & Framework CSS responsive \\
+\hline
+Auth & JWT & Tokens d'authentification sécurisés \\
+\hline
+ORM & Mongoose & Modélisation des données MongoDB \\
+\hline
+DevOps & Docker & Conteneurisation de l'application \\
+\hline
+CI/CD & GitHub Actions & Automatisation des déploiements \\
+\hline
+Cloud & Azure & Hébergement en production \\
+\hline
+\end{tabular}
+\label{tab:technologies}
+\end{table}
+
+\section{Sécurité}
+
+\subsection{JSON Web Tokens (JWT)}
+JWT est un standard ouvert (RFC 7519) pour la transmission sécurisée d'informations entre parties sous forme de token JSON signé.
+
+\begin{lstlisting}[language=javascript, caption=Structure d'un JWT]
+// Header
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+// Payload
+{
+  "userId": "507f1f77bcf86cd799439011",
+  "role": "admin",
+  "exp": 1735056000
+}
+\end{lstlisting}
+
+\newpage
+
+% ============================================
+% CHAPITRE 3 : CONCEPTION
+% ============================================
+\chapter{Conception}
+
+\section{Architecture globale}
+
+FlowOps adopte une architecture client-serveur avec séparation claire entre le frontend et le backend.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, minimum width=2.5cm, minimum height=1cm, align=center, fill=blue!10},
+    db/.style={cylinder, draw, shape border rotate=90, aspect=0.3, minimum height=1.5cm, minimum width=1.5cm, fill=green!10}
+]
+    % Client
+    \node[box] (browser) at (0,0) {Navigateur\\(React)};
+    
+    % Backend
+    \node[box] (api) at (5,0) {API Express\\(Node.js)};
+    
+    % Database
+    \node[db] (db) at (10,0) {MongoDB};
+    
+    % Arrows
+    \draw[<->, thick] (browser) -- node[above] {HTTP/REST} (api);
+    \draw[<->, thick] (api) -- node[above] {Mongoose} (db);
+    
+    % Labels
+    \node at (0,-1.5) {\textbf{Frontend}};
+    \node at (5,-1.5) {\textbf{Backend}};
+    \node at (10,-1.5) {\textbf{Database}};
+\end{tikzpicture}
+\caption{Architecture globale de FlowOps}
+\label{fig:architecture}
+\end{figure}
+
+\section{Diagramme de cas d'utilisation}
+
+% TODO: Ajouter le diagramme de cas d'utilisation
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=0.9\textwidth]{images/use-case-diagram.png}
+% \caption{Diagramme de cas d'utilisation}
+% \label{fig:use-case}
+% \end{figure}
+
+Les principaux acteurs du système sont :
+\begin{itemize}
+    \item \textbf{Visiteur} : Peut s'inscrire et se connecter
+    \item \textbf{Membre} : Peut consulter et mettre à jour ses tâches assignées
+    \item \textbf{Chef de projet} : Peut gérer les projets et les tâches
+    \item \textbf{Administrateur} : Accès complet, gestion des utilisateurs
+\end{itemize}
+
+\section{Modélisation de la base de données}
+
+\subsection{Diagramme de classes}
+
+Le modèle de données de FlowOps comprend quatre entités principales :
+
+\begin{table}[H]
+\centering
+\caption{Schéma de la collection Users}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Champ} & \textbf{Type} & \textbf{Description} \\
+\hline
+\_id & ObjectId & Identifiant unique \\
+\hline
+name & String & Nom de l'utilisateur \\
+\hline
+email & String & Email (unique) \\
+\hline
+password & String & Mot de passe hashé (bcrypt) \\
+\hline
+role & String & admin | project\_manager | member \\
+\hline
+createdAt & Date & Date de création \\
+\hline
+\end{tabular}
+\label{tab:users}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Schéma de la collection Projects}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Champ} & \textbf{Type} & \textbf{Description} \\
+\hline
+\_id & ObjectId & Identifiant unique \\
+\hline
+name & String & Nom du projet \\
+\hline
+description & String & Description détaillée \\
+\hline
+status & String & active | completed | on-hold \\
+\hline
+owner & ObjectId & Référence vers Users \\
+\hline
+members & [ObjectId] & Liste des membres \\
+\hline
+createdAt & Date & Date de création \\
+\hline
+\end{tabular}
+\label{tab:projects}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Schéma de la collection Tasks}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Champ} & \textbf{Type} & \textbf{Description} \\
+\hline
+\_id & ObjectId & Identifiant unique \\
+\hline
+title & String & Titre de la tâche \\
+\hline
+description & String & Description détaillée \\
+\hline
+status & String & todo | in-progress | done \\
+\hline
+priority & String & low | medium | high \\
+\hline
+project & ObjectId & Référence vers Projects \\
+\hline
+assignedTo & ObjectId & Utilisateur assigné \\
+\hline
+dueDate & Date & Date d'échéance \\
+\hline
+\end{tabular}
+\label{tab:tasks}
+\end{table}
+
+\section{Diagramme de séquence}
+
+% TODO: Ajouter les diagrammes de séquence pour les cas d'utilisation principaux
+
+\subsection{Authentification}
+Le processus d'authentification suit le flux suivant :
+\begin{enumerate}
+    \item L'utilisateur envoie ses identifiants (email, mot de passe)
+    \item Le serveur vérifie les credentials dans la base de données
+    \item Si valides, un token JWT est généré et retourné
+    \item Le client stocke le token et l'inclut dans les requêtes suivantes
+\end{enumerate}
+
+\newpage
+
+% ============================================
+% CHAPITRE 4 : RÉALISATION
+% ============================================
+\chapter{Réalisation}
+
+\section{Environnement de développement}
+
+\begin{table}[H]
+\centering
+\caption{Environnement de développement}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Outil} & \textbf{Version} \\
+\hline
+Node.js & 20.x LTS \\
+\hline
+npm & 10.x \\
+\hline
+MongoDB & 7.x \\
+\hline
+Docker & 24.x \\
+\hline
+VS Code & Latest \\
+\hline
+Git & 2.x \\
+\hline
+\end{tabular}
+\label{tab:env}
+\end{table}
+
+\section{Backend - API Express.js}
+
+\subsection{Structure du projet}
+
+\begin{lstlisting}[language=bash, caption=Structure du backend]
+backend/
+|-- config/
+|   |-- db.js           # Configuration MongoDB
+|-- controllers/
+|   |-- authController.js
+|   |-- projectController.js
+|   |-- taskController.js
+|-- middleware/
+|   |-- auth.js         # Middleware JWT
+|   |-- errorHandler.js
+|-- models/
+|   |-- User.js
+|   |-- Project.js
+|   |-- Task.js
+|-- routes/
+|   |-- auth.js
+|   |-- projects.js
+|   |-- tasks.js
+|-- server.js           # Point d'entree
+\end{lstlisting}
+
+\subsection{Endpoints de l'API}
+
+\begin{table}[H]
+\centering
+\caption{Endpoints de l'API REST}
+\begin{tabular}{|l|l|p{5cm}|}
+\hline
+\textbf{Méthode} & \textbf{Route} & \textbf{Description} \\
+\hline
+POST & /api/auth/register & Inscription d'un utilisateur \\
+\hline
+POST & /api/auth/login & Connexion utilisateur \\
+\hline
+GET & /api/auth/me & Profil de l'utilisateur connecté \\
+\hline
+GET & /api/projects & Liste des projets \\
+\hline
+POST & /api/projects & Création d'un projet \\
+\hline
+GET & /api/projects/:id/tasks & Tâches d'un projet \\
+\hline
+POST & /api/projects/:id/tasks & Création d'une tâche \\
+\hline
+PUT & /api/tasks/:id & Mise à jour d'une tâche \\
+\hline
+DELETE & /api/tasks/:id & Suppression d'une tâche \\
+\hline
+\end{tabular}
+\label{tab:endpoints}
+\end{table}
+
+\subsection{Middleware d'authentification}
+
+\begin{lstlisting}[language=javascript, caption=Middleware JWT (auth.js)]
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+const protect = async (req, res, next) => {
+  let token;
+  
+  if (req.headers.authorization?.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+  
+  if (!token) {
+    return res.status(401).json({ 
+      message: 'Non autorise, token manquant' 
+    });
+  }
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id).select('-password');
+    next();
+  } catch (error) {
+    res.status(401).json({ message: 'Token invalide' });
+  }
+};
+
+module.exports = { protect };
+\end{lstlisting}
+
+\section{Frontend - React}
+
+\subsection{Structure du projet}
+
+\begin{lstlisting}[language=bash, caption=Structure du frontend]
+frontend/src/
+|-- components/
+|   |-- Layout.jsx      # Layout principal avec sidebar
+|   |-- Navbar.jsx
+|   |-- TaskCard.jsx
+|   |-- ProjectCard.jsx
+|-- context/
+|   |-- AuthContext.jsx # Gestion de l'authentification
+|-- pages/
+|   |-- Dashboard.jsx
+|   |-- Login.jsx
+|   |-- Register.jsx
+|   |-- Projects.jsx
+|   |-- Tasks.jsx
+|-- services/
+|   |-- api.js          # Client Axios
+|-- App.jsx
+|-- main.jsx
+\end{lstlisting}
+
+\subsection{Context d'authentification}
+
+\begin{lstlisting}[language=javascript, caption=AuthContext.jsx]
+import { createContext, useState, useContext, useEffect } from 'react';
+import api from '../services/api';
+
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const login = async (email, password) => {
+    const { data } = await api.post('/auth/login', { email, password });
+    localStorage.setItem('token', data.token);
+    setUser(data.user);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);
+\end{lstlisting}
+
+\section{DevOps et Déploiement}
+
+\subsection{Docker}
+
+L'application est conteneurisée avec Docker pour faciliter le déploiement.
+
+\begin{lstlisting}[language=dockerfile, caption=Dockerfile du backend]
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY . .
+
+EXPOSE 3001
+CMD ["node", "server.js"]
+\end{lstlisting}
+
+\subsection{Docker Compose}
+
+\begin{lstlisting}[language=yaml, caption=docker-compose.yml]
+version: '3.8'
+services:
+  mongodb:
+    image: mongo:7
+    volumes:
+      - mongo_data:/data/db
+    
+  backend:
+    build: ./backend
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/flowops
+      
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
+\end{lstlisting}
+
+\subsection{CI/CD avec GitHub Actions}
+
+Le pipeline CI/CD automatise les tests et le déploiement :
+
+\begin{enumerate}
+    \item \textbf{Build} : Compilation du frontend et backend
+    \item \textbf{Test} : Exécution des tests unitaires
+    \item \textbf{Docker} : Construction des images
+    \item \textbf{Deploy} : Déploiement sur Azure
+\end{enumerate}
+
+\newpage
+
+% ============================================
+% CHAPITRE 5 : TESTS ET VALIDATION
+% ============================================
+\chapter{Tests et Validation}
+
+\section{Stratégie de test}
+
+La stratégie de test de FlowOps comprend plusieurs niveaux :
+
+\begin{table}[H]
+\centering
+\caption{Niveaux de tests}
+\begin{tabular}{|l|p{8cm}|}
+\hline
+\textbf{Type} & \textbf{Description} \\
+\hline
+Tests unitaires & Validation des fonctions individuelles \\
+\hline
+Tests d'intégration & Validation des interactions entre composants \\
+\hline
+Tests E2E & Validation des scénarios utilisateur complets \\
+\hline
+Tests de performance & Validation des temps de réponse \\
+\hline
+\end{tabular}
+\label{tab:tests}
+\end{table}
+
+\section{Tests du backend}
+
+% TODO: Ajouter les résultats des tests
+
+\section{Tests du frontend}
+
+La commande \texttt{npm run build} permet de vérifier que l'application se compile correctement sans erreurs.
+
+\section{Captures d'écran}
+
+% TODO: Ajouter les captures d'écran de l'application
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=0.9\textwidth]{images/dashboard.png}
+% \caption{Tableau de bord principal}
+% \label{fig:dashboard}
+% \end{figure}
+
+\section{Validation des fonctionnalités}
+
+\begin{table}[H]
+\centering
+\caption{Validation des fonctionnalités}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Fonctionnalité} & \textbf{Statut} & \textbf{Commentaire} \\
+\hline
+Inscription utilisateur & \checkmark & Validé \\
+\hline
+Connexion / Déconnexion & \checkmark & Validé \\
+\hline
+Création de projet & \checkmark & Validé \\
+\hline
+Gestion des tâches & \checkmark & Validé \\
+\hline
+Tableau Kanban & \checkmark & Validé \\
+\hline
+Rôles utilisateurs & \checkmark & Validé \\
+\hline
+\end{tabular}
+\label{tab:validation}
+\end{table}
+
+\newpage
+
+% ============================================
+% CONCLUSION
+% ============================================
+\chapter*{Conclusion Générale}
+\addcontentsline{toc}{chapter}{Conclusion Générale}
+
+Ce projet a permis de développer FlowOps, une application web complète de gestion de projets utilisant la stack MERN. Les principaux objectifs ont été atteints :
+
+\begin{itemize}
+    \item Une API RESTful fonctionnelle avec Express.js et MongoDB
+    \item Une interface utilisateur moderne et responsive avec React et Bootstrap 5
+    \item Un système d'authentification sécurisé basé sur JWT
+    \item Une architecture conteneurisée avec Docker
+    \item Un pipeline CI/CD automatisé avec GitHub Actions
+\end{itemize}
+
+\section*{Difficultés rencontrées}
+
+% TODO: Décrire les difficultés rencontrées
+Parmi les défis rencontrés lors de ce projet, on peut citer :
+\begin{itemize}
+    \item La gestion de l'état global avec React Context
+    \item La configuration du proxy entre frontend et backend
+    \item La mise en place du pipeline CI/CD
+\end{itemize}
+
+\section*{Perspectives}
+
+Plusieurs améliorations sont envisagées pour les versions futures :
+\begin{itemize}
+    \item Ajout de notifications en temps réel avec WebSockets
+    \item Intégration d'un système de commentaires sur les tâches
+    \item Export des données en PDF/Excel
+    \item Application mobile avec React Native
+    \item Intégration avec des outils externes (Slack, GitHub)
+\end{itemize}
+
+\newpage
+
+% ============================================
+% BIBLIOGRAPHIE
+% ============================================
+\chapter*{Bibliographie}
+\addcontentsline{toc}{chapter}{Bibliographie}
+
+\begin{enumerate}
+    \item MongoDB Documentation. \textit{MongoDB Manual}. \url{https://docs.mongodb.com/manual/}
+    
+    \item Express.js. \textit{Express.js Guide}. \url{https://expressjs.com/}
+    
+    \item React Documentation. \textit{React Docs}. \url{https://react.dev/}
+    
+    \item Node.js. \textit{Node.js Documentation}. \url{https://nodejs.org/docs/}
+    
+    \item Docker. \textit{Docker Documentation}. \url{https://docs.docker.com/}
+    
+    \item GitHub Actions. \textit{GitHub Actions Documentation}. \url{https://docs.github.com/en/actions}
+    
+    \item Bootstrap. \textit{Bootstrap 5 Documentation}. \url{https://getbootstrap.com/docs/5.3/}
+    
+    \item JWT. \textit{JSON Web Tokens Introduction}. \url{https://jwt.io/introduction}
+\end{enumerate}
+
+\newpage
+
+% ============================================
+% ANNEXES
+% ============================================
+\appendix
+\chapter{Annexes}
+
+\section{Code source complet}
+
+Le code source complet du projet est disponible sur GitHub :
+\url{https://github.com/[username]/FlowOps}
+
+\section{Guide d'installation}
+
+\subsection{Prérequis}
+\begin{itemize}
+    \item Node.js 20+
+    \item MongoDB (local ou Docker)
+    \item npm ou yarn
+\end{itemize}
+
+\subsection{Installation avec Docker}
+\begin{lstlisting}[language=bash]
+git clone https://github.com/[username]/FlowOps.git
+cd FlowOps
+docker-compose up -d
+\end{lstlisting}
+
+\subsection{Installation manuelle}
+\begin{lstlisting}[language=bash]
+# Backend
+cd backend
+cp .env.example .env
+npm install
+npm run dev
+
+# Frontend (nouveau terminal)
+cd frontend
+npm install
+npm run dev
+\end{lstlisting}
+
+\section{Variables d'environnement}
+
+\begin{lstlisting}[language=bash, caption=Fichier .env du backend]
+PORT=3001
+MONGO_URI=mongodb://localhost:27017/flowops
+JWT_SECRET=your_secret_key_here
+NODE_ENV=development
+\end{lstlisting}
+
+\end{document}

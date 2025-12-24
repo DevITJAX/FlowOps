@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: flowops-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: flowops
+      MONGO_INITDB_ROOT_PASSWORD: flowops_secret
+      MONGO_INITDB_DATABASE: flowops
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - flowops-network
+
+  # Express.js Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: flowops-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - MONGO_URI=mongodb://flowops:flowops_secret@mongodb:27017/flowops?authSource=admin
+      - JWT_SECRET=flowops_jwt_secret_change_in_production
+    depends_on:
+      - mongodb
+    networks:
+      - flowops-network
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: flowops-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - flowops-network
+
+volumes:
+  mongodb_data:
+
+
+networks:
+  flowops-network:
+    driver: bridge

@@ -1,0 +1,71 @@
+:root {
+  --primary-color: #0d6efd;
+  --bg-dark: #212529;
+  --text-light: #f8f9fa;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f4f7f6;
+}
+
+.bg-auth {
+  background-color: var(--bg-dark);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  border-radius: 12px;
+}
+
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background-color: var(--bg-dark);
+  color: white;
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+.main-wrapper {
+  margin-left: 250px;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.kanban-col {
+  min-height: 70vh;
+  background-color: #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    position: relative;
+  }
+
+  .main-wrapper {
+    margin-left: 0;
+  }
+}

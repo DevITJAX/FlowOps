@@ -1,0 +1,58 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: [main]
+
+env:
+  AZURE_CONTAINER_REGISTRY: flowopsacr
+  RESOURCE_GROUP: flowops-rg
+  BACKEND_APP_NAME: flowops-backend
+  FRONTEND_APP_NAME: flowops-frontend
+
+jobs:
+  deploy:
+    name: Build and Deploy to Azure
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and Push Backend Image
+        run: |
+          docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/flowops-backend:${{ github.sha }} ./backend
+          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/flowops-backend:${{ github.sha }}
+          docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/flowops-backend:${{ github.sha }} ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/flowops-backend:latest
+          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/flowops-backend:latest
+
+      - name: Build and Push Frontend Image
+        run: |
+          docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/flowops-frontend:${{ github.sha }} ./frontend
+          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/flowops-frontend:${{ github.sha }}
+          docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/flowops-frontend:${{ github.sha }} ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/flowops-frontend:latest
+          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/flowops-frontend:latest
+
+      - name: Deploy Backend to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.BACKEND_APP_NAME }}
+          images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/flowops-backend:${{ github.sha }}
+
+      - name: Deploy Frontend to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.FRONTEND_APP_NAME }}
+          images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/flowops-frontend:${{ github.sha }}
