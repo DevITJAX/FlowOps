@@ -5,7 +5,6 @@ on:
     branches: [main]
 
 env:
-  AZURE_CONTAINER_REGISTRY: flowopsacr
   RESOURCE_GROUP: flowops-rg
 
 jobs:
@@ -23,11 +22,11 @@ jobs:
           node-version: '20'
 
       # Build Backend
-      - name: Build Backend
+      - name: Install Backend Dependencies
         run: |
           cd backend
           npm ci
-          
+
       # Build Frontend
       - name: Build Frontend
         run: |
@@ -43,10 +42,20 @@ jobs:
           publish-profile: ${{ secrets.AZURE_BACKEND_PUBLISH_PROFILE }}
           package: ./backend
 
-      # Deploy Frontend to Azure App Service
+      # Deploy Frontend to Azure App Service (include dist, server.js, package.json)
+      - name: Prepare Frontend for Deployment
+        run: |
+          cd frontend
+          mkdir -p deploy
+          cp -r dist deploy/
+          cp server.js deploy/
+          cp package.json deploy/
+          cd deploy
+          npm install --production
+          
       - name: Deploy Frontend
         uses: azure/webapps-deploy@v3
         with:
           app-name: flowops-frontend
           publish-profile: ${{ secrets.AZURE_FRONTEND_PUBLISH_PROFILE }}
-          package: ./frontend/dist
+          package: ./frontend/deploy
