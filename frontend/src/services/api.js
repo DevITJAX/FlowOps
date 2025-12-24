@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// API URL - uses environment variable in production, localhost in development
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
 const api = axios.create({
-    baseURL: 'http://localhost:3001/api'
+    baseURL: API_BASE_URL
 });
 
 // Request interceptor to add auth token
@@ -110,7 +113,7 @@ export const attachmentsAPI = {
     upload: (taskId, formData) => api.post(`/tasks/${taskId}/attachments`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
     }),
-    download: (id) => `http://localhost:3001/api/attachments/${id}/download`,
+    download: (id) => `${API_BASE_URL}/attachments/${id}/download`,
     delete: (id) => api.delete(`/attachments/${id}`)
 };
 

@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
 
+env:
+  BACKEND_URL: https://flowops-backend.azurewebsites.net
+
 jobs:
   deploy:
     name: Deploy to Azure
@@ -18,12 +21,12 @@ jobs:
         with:
           node-version: '20'
 
-      # Build Frontend
+      # Build Frontend with production API URL
       - name: Build Frontend
         run: |
           cd frontend
           npm ci
-          npm run build
+          VITE_API_URL=${{ env.BACKEND_URL }}/api npm run build
           cp server.js dist/
           cp package.json dist/
           cd dist
