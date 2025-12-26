@@ -91,7 +91,7 @@ const TaskSchema = new mongoose.Schema({
 });
 
 // Generate task key before saving (e.g., PROJ-1, PROJ-2)
-TaskSchema.pre('save', async function (next) {
+TaskSchema.pre('save', async function () {
     if (this.isNew && !this.taskKey) {
         const Project = mongoose.model('Project');
         const project = await Project.findById(this.project);
@@ -100,7 +100,6 @@ TaskSchema.pre('save', async function (next) {
         this.taskKey = `${prefix}-${count + 1}`;
     }
     this.updatedAt = Date.now();
-    next();
 });
 
 module.exports = mongoose.model('Task', TaskSchema);
