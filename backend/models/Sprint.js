@@ -50,17 +50,21 @@ const SprintSchema = new mongoose.Schema({
 
 // Ensure only one active sprint per project
 SprintSchema.pre('save', async function (next) {
-    if (this.status === 'active') {
-        const existingActive = await this.constructor.findOne({
-            project: this.project,
-            status: 'active',
-            _id: { $ne: this._id }
-        });
-        if (existingActive) {
-            throw new Error('Project already has an active sprint');
+    try {
+        if (this.status === 'active') {
+            const existingActive = await this.constructor.findOne({
+                project: this.project,
+                status: 'active',
+                _id: { $ne: this._id }
+            });
+            if (existingActive) {
+                return next(new Error('Project already has an active sprint'));
+            }
         }
+        next();
+    } catch (error) {
+        next(error);
     }
-    next();
 });
 
 // Calculate duration in days

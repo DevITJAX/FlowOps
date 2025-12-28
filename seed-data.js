@@ -146,6 +146,89 @@ async function seedData() {
         }
     }
 
+    // 5. Create sample sprints for first project
+    console.log('\n5. Creating sample sprints...');
+    
+    if (createdProjects.length > 0) {
+        const project = createdProjects[0];
+        const projectId = project._id || project.id;
+        
+        // Get tasks for this project to add to sprints
+        const tasksRes = await fetch(`${API_URL}/projects/${projectId}/tasks`, { headers });
+        const tasksData = await tasksRes.json();
+        const projectTasks = tasksData.data || [];
+        
+        const today = new Date();
+        const twoWeeksFromNow = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
+        const fourWeeksFromNow = new Date(today.getTime() + 28 * 24 * 60 * 60 * 1000);
+        
+        const sprints = [
+            {
+                name: 'Sprint 1 - Foundation',
+                goal: 'Set up project foundation, authentication, and basic API structure',
+                startDate: today.toISOString(),
+                endDate: twoWeeksFromNow.toISOString()
+            },
+            {
+                name: 'Sprint 2 - Core Features',
+                goal: 'Implement core business features and UI components',
+                startDate: twoWeeksFromNow.toISOString(),
+                endDate: fourWeeksFromNow.toISOString()
+            }
+        ];
+        
+        const createdSprints = [];
+        for (const sprint of sprints) {
+            try {
+                const res = await fetch(`${API_URL}/projects/${projectId}/sprints`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(sprint)
+                });
+                const data = await res.json();
+                if (data.success && data.data) {
+                    createdSprints.push(data.data);
+                    console.log(`   ✅ Created: ${sprint.name}`);
+                } else {
+                    console.log(`   ❌ ${sprint.name}: ${data.message || JSON.stringify(data)}`);
+                }
+            } catch (e) {
+                console.log(`   ❌ Failed: ${sprint.name} - ${e.message}`);
+            }
+        }
+        
+        // Start the first sprint and add tasks to it
+        if (createdSprints.length > 0) {
+            const firstSprint = createdSprints[0];
+            
+            // Add some tasks to the sprint
+            const taskIdsForSprint = projectTasks.slice(0, 6).map(t => t._id);
+            if (taskIdsForSprint.length > 0) {
+                try {
+                    await fetch(`${API_URL}/sprints/${firstSprint._id}/tasks`, {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify({ taskIds: taskIdsForSprint })
+                    });
+                    console.log(`   ✅ Added ${taskIdsForSprint.length} tasks to Sprint 1`);
+                } catch (e) {
+                    console.log(`   ❌ Failed to add tasks to sprint`);
+                }
+            }
+            
+            // Start the sprint
+            try {
+                await fetch(`${API_URL}/sprints/${firstSprint._id}/start`, {
+                    method: 'PUT',
+                    headers
+                });
+                console.log(`   ✅ Started Sprint 1`);
+            } catch (e) {
+                console.log(`   ❌ Failed to start sprint: ${e.message}`);
+            }
+        }
+    }
+
     console.log('\n✅ Seeding complete!');
     console.log('\n📋 Login credentials:');
     console.log('   Email: demo@flowops.com');
@@ -154,3 +237,4 @@ async function seedData() {
 }
 
 seedData().catch(console.error);
+
