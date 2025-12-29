@@ -1,8 +1,6 @@
 // Seed script for FlowOps - Run with: node seed-data.js
-
-// Change to localhost for local testing, or use Azure backend for production
-const API_URL = process.env.API_URL || 'http://localhost:3001/api';
-// const API_URL = 'https://flowops-backend.azurewebsites.net/api';
+// Use API_URL=http://localhost:3001/api node seed-data.js for local testing
+const API_URL = process.env.API_URL || 'https://flowops-backend.azurewebsites.net/api';
 
 async function seedData() {
     console.log('🌱 Seeding FlowOps database...\n');
