@@ -126,4 +126,18 @@ export const notificationsAPI = {
     clearRead: () => api.delete('/notifications/clear')
 };
 
+export const teamsAPI = {
+    getByProject: (projectId) => api.get(`/projects/${projectId}/teams`),
+    getOne: (id) => api.get(`/teams/${id}`),
+    create: (projectId, data) => api.post(`/projects/${projectId}/teams`, data),
+    update: (id, data) => api.put(`/teams/${id}`, data),
+    delete: (id) => api.delete(`/teams/${id}`),
+    // Team member management
+    addMember: (teamId, data) => api.post(`/teams/${teamId}/members`, data),
+    removeMember: (teamId, userId) => api.delete(`/teams/${teamId}/members/${userId}`),
+    updateMemberRole: (teamId, userId, data) => api.put(`/teams/${teamId}/members/${userId}`, data),
+    getAvailableUsers: (teamId) => api.get(`/teams/${teamId}/available-users`)
+};
+
 export default api;
+

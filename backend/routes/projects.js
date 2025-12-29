@@ -18,6 +18,7 @@ const router = express.Router();
 router.use('/:projectId/tasks', require('./tasks'));
 router.use('/:projectId/labels', require('./labels'));
 router.use('/:projectId/sprints', require('./sprints'));
+router.use('/:projectId/teams', require('./teams').projectRouter);
 
 router.use(protect);
 

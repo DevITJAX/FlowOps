@@ -40,6 +40,7 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/projects', require('./routes/projects'));
 app.use('/api/tasks', require('./routes/tasks'));
 app.use('/api/sprints', require('./routes/sprintActions'));
+app.use('/api/teams', require('./routes/teams').teamRouter);
 app.use('/api/activity', require('./routes/activity'));
 app.use('/api/comments', require('./routes/comments'));
 app.use('/api/labels', require('./routes/labels'));
