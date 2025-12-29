@@ -2,12 +2,58 @@
   --primary-color: #0d6efd;
   --bg-dark: #212529;
   --text-light: #f8f9fa;
+  --bg-body: #f4f7f6;
+  --bg-card: #ffffff;
+  --text-primary: #212529;
+  --text-muted: #6c757d;
+  --border-color: #dee2e6;
+  --kanban-bg: #e9ecef;
+}
+
+[data-theme="dark"] {
+  --bg-body: #1a1d21;
+  --bg-card: #2d3238;
+  --text-primary: #f8f9fa;
+  --text-muted: #adb5bd;
+  --border-color: #495057;
+  --kanban-bg: #343a40;
 }
 
 body {
   margin: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #f4f7f6;
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-theme="dark"] .card {
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .card-header {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .table {
+  --bs-table-bg: var(--bg-card);
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+  background-color: #343a40;
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+  background-color: #3d4349;
+  color: var(--text-primary);
 }
 
 .bg-auth {
@@ -53,9 +99,18 @@ body {
 
 .kanban-col {
   min-height: 70vh;
-  background-color: #e9ecef;
+  background-color: var(--kanban-bg);
   border-radius: 8px;
   padding: 1rem;
+}
+
+.theme-toggle {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
 }
 
 @media (max-width: 768px) {

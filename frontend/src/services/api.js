@@ -31,7 +31,13 @@ api.interceptors.response.use(
 export const authAPI = {
     login: (data) => api.post('/auth/login', data),
     register: (data) => api.post('/auth/register', data),
-    getMe: () => api.get('/auth/me')
+    getMe: () => api.get('/auth/me'),
+    forgotPassword: (data) => api.post('/auth/forgot-password', data),
+    resetPassword: (token, data) => api.put(`/auth/reset-password/${token}`, data),
+    refreshToken: (data) => api.post('/auth/refresh-token', data),
+    updatePassword: (data) => api.put('/auth/update-password', data),
+    updateProfile: (data) => api.put('/auth/update-profile', data),
+    logout: () => api.post('/auth/logout')
 };
 
 export const projectsAPI = {

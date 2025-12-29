@@ -1,0 +1,823 @@
+@startuml "Diagramme de Cas d'Utilisation FlowOps"
+' ============================================================
+' DIAGRAMME 1 : CAS D'UTILISATION
+' ============================================================
+
+skinparam backgroundColor #FEFEFE
+skinparam usecase {
+    BackgroundColor #E8F4FD
+    BorderColor #2196F3
+    ArrowColor #2196F3
+}
+skinparam actor {
+    BackgroundColor #FFF3E0
+    BorderColor #FF9800
+}
+
+title Diagramme de Cas d'Utilisation - FlowOps
+
+left to right direction
+
+' Acteurs
+actor "Visiteur" as Visitor
+actor "Membre" as Member
+actor "Chef de Projet" as PM
+actor "Administrateur" as Admin
+
+' Héritage des acteurs
+Visitor <|-- Member
+Member <|-- PM
+PM <|-- Admin
+
+' Système FlowOps
+rectangle "FlowOps - Gestion de Projets Agile" {
+    ' Authentification
+    package "Authentification" {
+        usecase "S'inscrire" as UC_Register
+        usecase "Se connecter" as UC_Login
+        usecase "Se déconnecter" as UC_Logout
+        usecase "Consulter son profil" as UC_Profile
+    }
+    
+    ' Gestion des Projets
+    package "Gestion des Projets" {
+        usecase "Créer un projet" as UC_CreateProject
+        usecase "Consulter les projets" as UC_ViewProjects
+        usecase "Modifier un projet" as UC_UpdateProject
+        usecase "Supprimer un projet" as UC_DeleteProject
+        usecase "Ajouter des membres" as UC_AddMembers
+    }
+    
+    ' Gestion des Tâches
+    package "Gestion des Tâches" {
+        usecase "Créer une tâche" as UC_CreateTask
+        usecase "Consulter les tâches" as UC_ViewTasks
+        usecase "Modifier une tâche" as UC_UpdateTask
+        usecase "Supprimer une tâche" as UC_DeleteTask
+        usecase "Assigner une tâche" as UC_AssignTask
+        usecase "Changer le statut" as UC_ChangeStatus
+        usecase "Ajouter des labels" as UC_AddLabels
+        usecase "Suivre une tâche" as UC_WatchTask
+    }
+    
+    ' Gestion des Sprints
+    package "Gestion des Sprints" {
+        usecase "Créer un sprint" as UC_CreateSprint
+        usecase "Démarrer un sprint" as UC_StartSprint
+        usecase "Terminer un sprint" as UC_EndSprint
+        usecase "Consulter le backlog" as UC_ViewBacklog
+    }
+    
+    ' Collaboration
+    package "Collaboration" {
+        usecase "Ajouter un commentaire" as UC_AddComment
+        usecase "Consulter les notifications" as UC_ViewNotifications
+        usecase "Joindre des fichiers" as UC_AttachFiles
+        usecase "Enregistrer le temps" as UC_LogTime
+    }
+    
+    ' Administration
+    package "Administration" {
+        usecase "Gérer les utilisateurs" as UC_ManageUsers
+        usecase "Consulter les statistiques" as UC_ViewStats
+    }
+}
+
+' Associations Visiteur
+Visitor --> UC_Register
+Visitor --> UC_Login
+
+' Associations Membre
+Member --> UC_Logout
+Member --> UC_Profile
+Member --> UC_ViewProjects
+Member --> UC_ViewTasks
+Member --> UC_CreateTask
+Member --> UC_UpdateTask
+Member --> UC_ChangeStatus
+Member --> UC_AddComment
+Member --> UC_ViewNotifications
+Member --> UC_WatchTask
+Member --> UC_AttachFiles
+Member --> UC_LogTime
+Member --> UC_ViewBacklog
+
+' Associations Chef de Projet
+PM --> UC_CreateProject
+PM --> UC_UpdateProject
+PM --> UC_AddMembers
+PM --> UC_DeleteTask
+PM --> UC_AssignTask
+PM --> UC_AddLabels
+PM --> UC_CreateSprint
+PM --> UC_StartSprint
+PM --> UC_EndSprint
+PM --> UC_ViewStats
+
+' Associations Administrateur
+Admin --> UC_DeleteProject
+Admin --> UC_ManageUsers
+
+' Relations Include
+UC_CreateTask ..> UC_ViewProjects : <<include>>
+UC_CreateSprint ..> UC_ViewProjects : <<include>>
+UC_AddComment ..> UC_ViewTasks : <<include>>
+
+' Relations Extend
+UC_AssignTask ..> UC_CreateTask : <<extend>>
+UC_AddLabels ..> UC_CreateTask : <<extend>>
+
+@enduml
+
+
+@startuml "Diagramme de Classes FlowOps"
+' ============================================================
+' DIAGRAMME 2 : CLASSES
+' ============================================================
+
+skinparam backgroundColor #FEFEFE
+skinparam class {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    ArrowColor #1976D2
+}
+
+title Diagramme de Classes - FlowOps
+
+' Énumérations
+enum UserRole {
+    admin
+    project_manager
+    member
+}
+
+enum ProjectStatus {
+    planned
+    in_progress
+    completed
+}
+
+enum TaskType {
+    task
+    bug
+    story
+    epic
+    subtask
+}
+
+enum TaskStatus {
+    todo
+    doing
+    review
+    done
+}
+
+enum TaskPriority {
+    lowest
+    low
+    medium
+    high
+    highest
+}
+
+enum SprintStatus {
+    planned
+    active
+    completed
+}
+
+enum NotificationType {
+    task_assigned
+    task_commented
+    task_mentioned
+    task_status_changed
+    sprint_started
+    sprint_completed
+    task_due_soon
+}
+
+' Classes principales
+class User {
+    - _id: ObjectId
+    - name: String
+    - email: String
+    - password: String
+    - role: UserRole
+    - isActive: Boolean
+    - createdAt: Date
+    --
+    + matchPassword(password): Boolean
+    + hashPassword(): void
+}
+
+class Project {
+    - _id: ObjectId
+    - name: String
+    - description: String
+    - status: ProjectStatus
+    - owner: ObjectId
+    - members: ObjectId[]
+    - createdAt: Date
+    --
+    + addMember(userId): void
+    + removeMember(userId): void
+}
+
+class Task {
+    - _id: ObjectId
+    - title: String
+    - description: String
+    - type: TaskType
+    - status: TaskStatus
+    - priority: TaskPriority
+    - storyPoints: Number
+    - originalEstimate: Number
+    - timeSpent: Number
+    - remainingEstimate: Number
+    - dueDate: Date
+    - project: ObjectId
+    - assignee: ObjectId
+    - reporter: ObjectId
+    - labels: ObjectId[]
+    - parent: ObjectId
+    - watchers: ObjectId[]
+    - sprint: ObjectId
+    - taskKey: String
+    - createdAt: Date
+    - updatedAt: Date
+    --
+    + generateTaskKey(): void
+    + addWatcher(userId): void
+    + removeWatcher(userId): void
+}
+
+class Sprint {
+    - _id: ObjectId
+    - name: String
+    - goal: String
+    - project: ObjectId
+    - status: SprintStatus
+    - startDate: Date
+    - endDate: Date
+    - velocity: Number
+    - completedPoints: Number
+    - createdBy: ObjectId
+    - createdAt: Date
+    --
+    + getDurationDays(): Number
+    + start(): void
+    + complete(): void
+}
+
+class Comment {
+    - _id: ObjectId
+    - content: String
+    - task: ObjectId
+    - author: ObjectId
+    - mentions: ObjectId[]
+    - isEdited: Boolean
+    - createdAt: Date
+    - updatedAt: Date
+    --
+    + edit(content): void
+}
+
+class Label {
+    - _id: ObjectId
+    - name: String
+    - color: String
+    - project: ObjectId
+    - createdBy: ObjectId
+    - createdAt: Date
+}
+
+class Notification {
+    - _id: ObjectId
+    - user: ObjectId
+    - type: NotificationType
+    - title: String
+    - message: String
+    - link: String
+    - relatedTask: ObjectId
+    - relatedProject: ObjectId
+    - isRead: Boolean
+    - createdAt: Date
+    --
+    + markAsRead(): void
+}
+
+class TimeLog {
+    - _id: ObjectId
+    - task: ObjectId
+    - user: ObjectId
+    - timeSpent: Number
+    - description: String
+    - loggedAt: Date
+    - createdAt: Date
+}
+
+class Attachment {
+    - _id: ObjectId
+    - filename: String
+    - originalName: String
+    - mimetype: String
+    - size: Number
+    - path: String
+    - task: ObjectId
+    - uploadedBy: ObjectId
+    - createdAt: Date
+}
+
+class Activity {
+    - _id: ObjectId
+    - type: String
+    - user: ObjectId
+    - project: ObjectId
+    - task: ObjectId
+    - description: String
+    - createdAt: Date
+}
+
+class IssueLink {
+    - _id: ObjectId
+    - sourceTask: ObjectId
+    - targetTask: ObjectId
+    - linkType: String
+    - createdBy: ObjectId
+    - createdAt: Date
+}
+
+' Relations
+User "1" --> "*" Project : owns
+User "*" <--> "*" Project : members
+User "1" --> "*" Task : reports
+User "0..1" --> "*" Task : assigned to
+User "1" --> "*" Comment : writes
+User "1" --> "*" Sprint : creates
+User "1" --> "*" Label : creates
+User "1" --> "*" TimeLog : logs
+User "1" --> "*" Attachment : uploads
+User "1" --> "*" Notification : receives
+
+Project "1" --> "*" Task : contains
+Project "1" --> "*" Sprint : has
+Project "1" --> "*" Label : has
+Project "1" --> "*" Activity : has
+
+Task "1" --> "*" Comment : has
+Task "1" --> "*" TimeLog : has
+Task "1" --> "*" Attachment : has
+Task "*" --> "*" Label : tagged with
+Task "0..1" --> "*" Task : parent of
+Task "*" --> "*" User : watchers
+Task "0..1" --> "*" Task : linked via IssueLink
+
+Sprint "0..1" --> "*" Task : contains
+
+@enduml
+
+
+@startuml "Diagramme de Séquence - Authentification"
+' ============================================================
+' DIAGRAMME 3 : SÉQUENCE - AUTHENTIFICATION
+' ============================================================
+
+skinparam backgroundColor #FEFEFE
+skinparam sequence {
+    ArrowColor #1976D2
+    LifeLineBorderColor #1976D2
+    ParticipantBackgroundColor #E3F2FD
+    ParticipantBorderColor #1976D2
+}
+
+title Diagramme de Séquence - Authentification (Login)
+
+actor "Utilisateur" as User
+participant "Frontend\n(React)" as Frontend
+participant "API Gateway\n(Express)" as API
+participant "AuthController" as AuthCtrl
+participant "UserModel" as UserModel
+database "MongoDB" as DB
+participant "JWT Service" as JWT
+
+== Connexion (Login) ==
+
+User -> Frontend : Saisir email et mot de passe
+activate Frontend
+
+Frontend -> API : POST /api/auth/login\n{email, password}
+activate API
+
+API -> AuthCtrl : login(req, res)
+activate AuthCtrl
+
+AuthCtrl -> AuthCtrl : Valider email et password
+
+alt Email ou password manquant
+    AuthCtrl --> API : 400 - "Please provide email and password"
+    API --> Frontend : Erreur 400
+    Frontend --> User : Afficher message d'erreur
+else Données valides
+    AuthCtrl -> UserModel : findOne({email}).select('+password')
+    activate UserModel
+    
+    UserModel -> DB : Query: find user by email
+    activate DB
+    DB --> UserModel : User document (avec password hashé)
+    deactivate DB
+    
+    UserModel --> AuthCtrl : User object
+    deactivate UserModel
+    
+    alt Utilisateur non trouvé
+        AuthCtrl --> API : 401 - "Invalid credentials"
+        API --> Frontend : Erreur 401
+        Frontend --> User : Afficher "Identifiants invalides"
+    else Utilisateur trouvé
+        AuthCtrl -> UserModel : matchPassword(enteredPassword)
+        activate UserModel
+        
+        UserModel -> UserModel : bcrypt.compare(password, hashedPassword)
+        UserModel --> AuthCtrl : Boolean (match result)
+        deactivate UserModel
+        
+        alt Mot de passe incorrect
+            AuthCtrl --> API : 401 - "Invalid credentials"
+            API --> Frontend : Erreur 401
+            Frontend --> User : Afficher "Identifiants invalides"
+        else Mot de passe correct
+            AuthCtrl -> JWT : sign({id: user._id}, secret, {expiresIn: '30d'})
+            activate JWT
+            JWT --> AuthCtrl : Token JWT
+            deactivate JWT
+            
+            AuthCtrl --> API : 200 - {success, token, user}
+            deactivate AuthCtrl
+            
+            API --> Frontend : Réponse JSON\n{token, user}
+            deactivate API
+            
+            Frontend -> Frontend : Stocker token dans localStorage
+            Frontend -> Frontend : Mettre à jour AuthContext
+            Frontend --> User : Rediriger vers Dashboard
+            deactivate Frontend
+        end
+    end
+end
+
+@enduml
+
+
+@startuml "Diagramme de Séquence - Création de Tâche"
+' ============================================================
+' DIAGRAMME 4 : SÉQUENCE - CRÉATION DE TÂCHE
+' ============================================================
+
+skinparam backgroundColor #FEFEFE
+skinparam sequence {
+    ArrowColor #4CAF50
+    LifeLineBorderColor #4CAF50
+    ParticipantBackgroundColor #E8F5E9
+    ParticipantBorderColor #4CAF50
+}
+
+title Diagramme de Séquence - Création de Tâche
+
+actor "Utilisateur" as User
+participant "Frontend\n(React)" as Frontend
+participant "API Gateway\n(Express)" as API
+participant "AuthMiddleware" as Auth
+participant "TaskController" as TaskCtrl
+participant "ProjectModel" as ProjectModel
+participant "TaskModel" as TaskModel
+database "MongoDB" as DB
+
+== Création d'une nouvelle tâche ==
+
+User -> Frontend : Cliquer "Nouvelle Tâche"
+activate Frontend
+
+Frontend -> Frontend : Afficher formulaire de création
+
+User -> Frontend : Remplir formulaire\n(title, description, priority, type, assignee)
+Frontend -> Frontend : Valider les données côté client
+
+Frontend -> API : POST /api/projects/:projectId/tasks\nHeaders: {Authorization: Bearer <token>}\nBody: {title, description, priority, type, assignee}
+activate API
+
+API -> Auth : protect(req, res, next)
+activate Auth
+
+Auth -> Auth : Extraire token du header
+Auth -> Auth : jwt.verify(token, secret)
+
+alt Token invalide ou expiré
+    Auth --> API : 401 - "Not authorized"
+    API --> Frontend : Erreur 401
+    Frontend --> User : Rediriger vers Login
+else Token valide
+    Auth -> DB : Trouver utilisateur par ID
+    Auth -> Auth : req.user = user
+    Auth --> API : next()
+    deactivate Auth
+    
+    API -> TaskCtrl : createTask(req, res)
+    activate TaskCtrl
+    
+    TaskCtrl -> TaskCtrl : req.body.project = projectId
+    TaskCtrl -> TaskCtrl : req.body.reporter = req.user.id
+    
+    TaskCtrl -> ProjectModel : findById(projectId)
+    activate ProjectModel
+    ProjectModel -> DB : Query: find project
+    DB --> ProjectModel : Project document
+    ProjectModel --> TaskCtrl : Project object
+    deactivate ProjectModel
+    
+    alt Projet non trouvé
+        TaskCtrl --> API : 404 - "Project not found"
+        API --> Frontend : Erreur 404
+        Frontend --> User : Afficher "Projet non trouvé"
+    else Projet trouvé
+        TaskCtrl -> TaskCtrl : Vérifier autorisation\n(owner || admin || member)
+        
+        alt Non autorisé
+            TaskCtrl --> API : 403 - "Not authorized"
+            API --> Frontend : Erreur 403
+            Frontend --> User : Afficher "Non autorisé"
+        else Autorisé
+            TaskCtrl -> TaskModel : create(taskData)
+            activate TaskModel
+            
+            TaskModel -> TaskModel : Générer taskKey\n(PREFIX-NUMBER)
+            TaskModel -> DB : Insert task document
+            activate DB
+            DB --> TaskModel : Task created
+            deactivate DB
+            
+            TaskModel --> TaskCtrl : New Task
+            deactivate TaskModel
+            
+            TaskCtrl -> TaskModel : findById(task._id)\n.populate('assignee')\n.populate('reporter')\n.populate('labels')
+            activate TaskModel
+            TaskModel -> DB : Query with populate
+            DB --> TaskModel : Populated Task
+            TaskModel --> TaskCtrl : Populated Task
+            deactivate TaskModel
+            
+            TaskCtrl --> API : 201 - {success: true, data: task}
+            deactivate TaskCtrl
+            
+            API --> Frontend : Réponse JSON\n{task}
+            deactivate API
+            
+            Frontend -> Frontend : Ajouter tâche à la liste
+            Frontend -> Frontend : Fermer le formulaire
+            Frontend --> User : Afficher notification "Tâche créée"
+            deactivate Frontend
+        end
+    end
+end
+
+@enduml
+
+
+@startuml "Diagramme Pipeline CI/CD"
+' ============================================================
+' DIAGRAMME 5 : PIPELINE CI/CD (Séquence)
+' ============================================================
+
+skinparam backgroundColor #FEFEFE
+skinparam sequence {
+    ArrowColor #FF9800
+    LifeLineBorderColor #FF9800
+    ParticipantBackgroundColor #FFF3E0
+    ParticipantBorderColor #FF9800
+}
+
+title Diagramme de Séquence - Pipeline CI/CD FlowOps
+
+actor "Développeur" as Dev
+participant "GitHub\nRepository" as GitHub
+participant "GitHub Actions\nCI Pipeline" as CI
+participant "GitHub Actions\nCD Pipeline" as CD
+participant "Docker\nBuildx" as Docker
+database "Azure Container\nRegistry (ACR)" as ACR
+participant "Azure App Service\nBackend" as BackendApp
+participant "Azure App Service\nFrontend" as FrontendApp
+
+== Phase 1: Commit & Push ==
+
+Dev -> GitHub : git push (main/develop)
+activate GitHub
+GitHub -> CI : Déclencher CI Pipeline
+activate CI
+
+== Phase 2: CI Pipeline ==
+
+note over CI : Trigger: push ou PR\nsur main/develop
+
+par Jobs Parallèles
+    CI -> CI : **Backend CI**\nCheckout code
+    CI -> CI : Setup Node.js 20
+    CI -> CI : npm ci (install deps)
+    CI -> CI : Test server startup
+else
+    CI -> CI : **Frontend CI**\nCheckout code
+    CI -> CI : Setup Node.js 20
+    CI -> CI : npm ci (install deps)
+    CI -> CI : npm run build
+end
+
+CI -> Docker : Setup Docker Buildx
+activate Docker
+
+par Build Images
+    Docker -> Docker : Build Backend Image\nflowops-backend:sha
+else
+    Docker -> Docker : Build Frontend Image\nflowops-frontend:sha
+end
+
+Docker --> CI : Images construites
+deactivate Docker
+
+CI --> GitHub : CI Success ✓
+deactivate CI
+
+== Phase 3: CD Pipeline (branche main uniquement) ==
+
+alt Branche main
+    GitHub -> CD : Déclencher CD Pipeline
+    activate CD
+    
+    note over CD : Trigger: push sur main
+    
+    CD -> CD : Checkout code
+    CD -> Docker : Setup Docker Buildx
+    activate Docker
+    
+    CD -> ACR : Login (ACR_USERNAME, ACR_PASSWORD)
+    activate ACR
+    ACR --> CD : Authentifié ✓
+    
+    par Build & Push Images
+        CD -> Docker : Build Backend avec cache
+        Docker -> ACR : Push flowopsacr.azurecr.io/\nflowops-backend:latest\nflowops-backend:sha
+    else
+        CD -> Docker : Build Frontend avec cache\n(VITE_API_URL=backend_url)
+        Docker -> ACR : Push flowopsacr.azurecr.io/\nflowops-frontend:latest\nflowops-frontend:sha
+    end
+    
+    deactivate Docker
+    
+    note over ACR : Images stockées\ndans le registre
+    
+    == Phase 4: Déploiement Azure ==
+    
+    CD -> BackendApp : Deploy via publish-profile\nImage: flowops-backend:sha
+    activate BackendApp
+    BackendApp -> ACR : Pull image
+    ACR --> BackendApp : Image téléchargée
+    BackendApp --> CD : Backend déployé ✓
+    deactivate BackendApp
+    
+    CD -> FrontendApp : Deploy via publish-profile\nImage: flowops-frontend:sha
+    activate FrontendApp
+    FrontendApp -> ACR : Pull image
+    ACR --> FrontendApp : Image téléchargée
+    FrontendApp --> CD : Frontend déployé ✓
+    deactivate FrontendApp
+    
+    deactivate ACR
+    
+    CD --> GitHub : CD Success ✓
+    deactivate CD
+    
+else Autre branche
+    note over GitHub : CD non déclenché\n(CI seulement)
+end
+
+GitHub --> Dev : Pipeline terminé ✓
+deactivate GitHub
+
+note over BackendApp, FrontendApp
+    Application accessible:
+    Backend: https://flowops-backend.azurewebsites.net
+    Frontend: https://flowops-frontend.azurewebsites.net
+end note
+
+@enduml
+
+
+@startuml "Diagramme d'Activité - Gestion des Tâches"
+' ============================================================
+' DIAGRAMME 6 : ACTIVITÉ - WORKFLOW COMPLET
+' ============================================================
+
+skinparam backgroundColor #FEFEFE
+skinparam activity {
+    BackgroundColor #E8F5E9
+    BorderColor #4CAF50
+    ArrowColor #4CAF50
+}
+skinparam swimlane {
+    BorderColor #1976D2
+}
+
+title Diagramme d'Activité - Workflow de Gestion d'un Projet FlowOps
+
+|#E3F2FD| Chef de Projet |
+start
+:Créer un nouveau projet;
+:Définir nom et description;
+:Ajouter les membres de l'équipe;
+
+|#FFF3E0| Équipe |
+:Consulter le projet;
+
+|#E3F2FD| Chef de Projet |
+:Créer un Sprint;
+:Définir objectifs et dates;
+:Démarrer le Sprint;
+
+|#E8F5E9| Membre |
+
+fork
+    :Créer des tâches;
+    :Définir type (Task/Bug/Story);
+    :Définir priorité;
+    :Estimer story points;
+fork again
+    :Consulter le Backlog;
+end fork
+
+|#E3F2FD| Chef de Projet |
+:Assigner les tâches aux membres;
+:Ajouter des labels;
+
+|#E8F5E9| Membre |
+
+repeat
+    :Sélectionner une tâche;
+    
+    :Changer statut → "Doing";
+    
+    while (Travail en cours?) is (oui)
+        fork
+            :Développer la fonctionnalité;
+            :Enregistrer le temps passé;
+        fork again
+            :Ajouter des commentaires;
+            :Joindre des fichiers;
+        end fork
+    endwhile (terminé)
+    
+    :Changer statut → "Review";
+    
+    |#FCE4EC| Reviewer |
+    :Réviser le travail;
+    
+    if (Travail validé?) then (oui)
+        :Approuver;
+    else (non)
+        :Demander corrections;
+        |#E8F5E9| Membre |
+        :Appliquer les corrections;
+        |#FCE4EC| Reviewer |
+        :Re-réviser;
+    endif
+    
+    |#E8F5E9| Membre |
+    :Changer statut → "Done";
+    
+    |#FFFDE7| Système |
+    :Envoyer notification;
+    :Mettre à jour les statistiques;
+    
+repeat while (Autres tâches?) is (oui)
+->non;
+
+|#E3F2FD| Chef de Projet |
+
+:Consulter les statistiques du Sprint;
+:Analyser la vélocité;
+
+if (Objectifs atteints?) then (oui)
+    :Terminer le Sprint;
+    :Calculer les points complétés;
+else (non)
+    :Reporter les tâches non terminées;
+    :Terminer le Sprint;
+endif
+
+if (Projet terminé?) then (oui)
+    :Changer statut projet → "Completed";
+    :Archiver le projet;
+    stop
+else (non)
+    :Planifier le prochain Sprint;
+    |#E3F2FD| Chef de Projet |
+    :Créer un nouveau Sprint;
+endif
+
+@enduml

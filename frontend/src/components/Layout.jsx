@@ -47,6 +47,16 @@ const Layout = () => {
                             <i className="bi bi-people me-2"></i> Team
                         </Link>
                     </li>
+                    <li>
+                        <Link to="/reports" className={`nav-link ${isActive('/reports')}`}>
+                            <i className="bi bi-graph-up me-2"></i> Reports
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/settings" className={`nav-link ${isActive('/settings')}`}>
+                            <i className="bi bi-gear me-2"></i> Settings
+                        </Link>
+                    </li>
                 </ul>
                 <hr />
                 <div className="dropdown">
@@ -60,7 +70,7 @@ const Layout = () => {
                         </div>
                     </a>
                     <ul className="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                        <li><a className="dropdown-item" href="#">Profile</a></li>
+                        <li><Link className="dropdown-item" to="/settings">Settings</Link></li>
                         <li><hr className="dropdown-divider" /></li>
                         <li><button className="dropdown-item" onClick={handleLogout}>Sign out</button></li>
                     </ul>
