@@ -47,4 +47,7 @@ AttachmentSchema.virtual('formattedSize').get(function () {
 
 AttachmentSchema.set('toJSON', { virtuals: true });
 
+// Index for Cosmos DB compatibility
+AttachmentSchema.index({ task: 1, createdAt: -1 });
+
 module.exports = mongoose.model('Attachment', AttachmentSchema);

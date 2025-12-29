@@ -1,6 +1,8 @@
 // Seed script for FlowOps - Run with: node seed-data.js
 
-const API_URL = 'https://flowops-backend.azurewebsites.net/api';
+// Change to localhost for local testing, or use Azure backend for production
+const API_URL = process.env.API_URL || 'http://localhost:3001/api';
+// const API_URL = 'https://flowops-backend.azurewebsites.net/api';
 
 async function seedData() {
     console.log('🌱 Seeding FlowOps database...\n');
@@ -148,20 +150,27 @@ async function seedData() {
 
     // 5. Create sample sprints for first project
     console.log('\n5. Creating sample sprints...');
-    
+
     if (createdProjects.length > 0) {
         const project = createdProjects[0];
         const projectId = project._id || project.id;
-        
-        // Get tasks for this project to add to sprints
-        const tasksRes = await fetch(`${API_URL}/projects/${projectId}/tasks`, { headers });
-        const tasksData = await tasksRes.json();
-        const projectTasks = tasksData.data || [];
-        
+
+        // Refresh tasks list for this project to ensure we have all tasks (newly created or existing)
+        console.log('   🔄 Fetching latest tasks for project...');
+        let projectTasks = [];
+        try {
+            const tasksRes = await fetch(`${API_URL}/projects/${projectId}/tasks`, { headers });
+            const tasksData = await tasksRes.json();
+            projectTasks = tasksData.data || [];
+            console.log(`   ✅ Found ${projectTasks.length} tasks available for sprints`);
+        } catch (e) {
+            console.log('   ⚠️ Failed to fetch tasks:', e.message);
+        }
+
         const today = new Date();
         const twoWeeksFromNow = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
         const fourWeeksFromNow = new Date(today.getTime() + 28 * 24 * 60 * 60 * 1000);
-        
+
         const sprints = [
             {
                 name: 'Sprint 1 - Foundation',
@@ -176,7 +185,7 @@ async function seedData() {
                 endDate: fourWeeksFromNow.toISOString()
             }
         ];
-        
+
         const createdSprints = [];
         for (const sprint of sprints) {
             try {
@@ -196,11 +205,11 @@ async function seedData() {
                 console.log(`   ❌ Failed: ${sprint.name} - ${e.message}`);
             }
         }
-        
+
         // Start the first sprint and add tasks to it
         if (createdSprints.length > 0) {
             const firstSprint = createdSprints[0];
-            
+
             // Add some tasks to the sprint
             const taskIdsForSprint = projectTasks.slice(0, 6).map(t => t._id);
             if (taskIdsForSprint.length > 0) {
@@ -215,7 +224,7 @@ async function seedData() {
                     console.log(`   ❌ Failed to add tasks to sprint`);
                 }
             }
-            
+
             // Start the sprint
             try {
                 await fetch(`${API_URL}/sprints/${firstSprint._id}/start`, {

@@ -90,14 +90,33 @@ const TaskSchema = new mongoose.Schema({
     }
 });
 
+// Index for Cosmos DB compatibility - required for sort operations
+TaskSchema.index({ createdAt: -1 });
+TaskSchema.index({ project: 1, createdAt: -1 });
+TaskSchema.index({ sprint: 1, createdAt: -1 });
+TaskSchema.index({ taskKey: 1 });
+
 // Generate task key before saving (e.g., PROJ-1, PROJ-2)
 TaskSchema.pre('save', async function () {
     if (this.isNew && !this.taskKey) {
         const Project = mongoose.model('Project');
         const project = await Project.findById(this.project);
+        // Use project key if available, otherwise derive from name
+        const prefix = project?.key || project?.name?.substring(0, 4).toUpperCase().replace(/[^A-Z0-9]/g, '') || 'TASK';
+
+        // Count existing tasks for this project and add 1
+        // This avoids Cosmos DB sorting issues
         const count = await this.constructor.countDocuments({ project: this.project });
-        const prefix = project?.name?.substring(0, 4).toUpperCase() || 'TASK';
-        this.taskKey = `${prefix}-${count + 1}`;
+        let nextNum = count + 1;
+
+        // Ensure uniqueness by checking if key exists and incrementing if needed
+        let taskKey = `${prefix}-${nextNum}`;
+        while (await this.constructor.findOne({ taskKey })) {
+            nextNum++;
+            taskKey = `${prefix}-${nextNum}`;
+        }
+
+        this.taskKey = taskKey;
     }
     this.updatedAt = Date.now();
 });

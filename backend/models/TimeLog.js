@@ -30,4 +30,7 @@ const TimeLogSchema = new mongoose.Schema({
     }
 });
 
+// Index for Cosmos DB compatibility
+TimeLogSchema.index({ task: 1, loggedAt: -1 });
+
 module.exports = mongoose.model('TimeLog', TimeLogSchema);

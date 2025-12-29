@@ -28,4 +28,8 @@ const ActivitySchema = new mongoose.Schema({
     }
 });
 
+// Index for Cosmos DB compatibility
+ActivitySchema.index({ targetType: 1, targetId: 1, createdAt: -1 });
+ActivitySchema.index({ user: 1, createdAt: -1 });
+
 module.exports = mongoose.model('Activity', ActivitySchema);

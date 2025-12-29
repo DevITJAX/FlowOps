@@ -48,22 +48,22 @@ const SprintSchema = new mongoose.Schema({
     }
 });
 
+// Indexes for Cosmos DB compatibility - required for sort operations
+SprintSchema.index({ project: 1, startDate: -1 });
+SprintSchema.index({ project: 1, endDate: -1 });
+SprintSchema.index({ project: 1, status: 1 });
+
 // Ensure only one active sprint per project
-SprintSchema.pre('save', async function (next) {
-    try {
-        if (this.status === 'active') {
-            const existingActive = await this.constructor.findOne({
-                project: this.project,
-                status: 'active',
-                _id: { $ne: this._id }
-            });
-            if (existingActive) {
-                return next(new Error('Project already has an active sprint'));
-            }
+SprintSchema.pre('save', async function () {
+    if (this.status === 'active') {
+        const existingActive = await this.constructor.findOne({
+            project: this.project,
+            status: 'active',
+            _id: { $ne: this._id }
+        });
+        if (existingActive) {
+            throw new Error('Project already has an active sprint');
         }
-        next();
-    } catch (error) {
-        next(error);
     }
 });
 

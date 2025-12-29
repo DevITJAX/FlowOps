@@ -33,6 +33,9 @@ const CommentSchema = new mongoose.Schema({
     }
 });
 
+// Index for Cosmos DB compatibility
+CommentSchema.index({ task: 1, createdAt: -1 });
+
 // Update the updatedAt field on save
 CommentSchema.pre('save', function (next) {
     if (!this.isNew) {
