@@ -18,7 +18,7 @@ const Layout = () => {
         <div className="d-flex">
             <div className="sidebar d-flex flex-column p-3">
                 <h3 className="mb-4 text-center">
-                    <i className="bi bi-kanban-fill me-2"></i>FlowOps
+                    <i className="bi bi-layers-half me-2"></i>FlowOps
                 </h3>
                 <hr />
                 <ul className="nav nav-pills flex-column mb-auto">
