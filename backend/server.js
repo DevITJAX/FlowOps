@@ -1,14 +1,11 @@
-// FlowOps Backend Server - v1.0.4 (Real-time features)
+// FlowOps Backend Server - v1.0.5 (Azure fix)
 const express = require('express');
 const http = require('http');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
-const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./config/swagger');
 const connectDB = require('./config/db');
-const { initializeSocket } = require('./config/socket');
 const errorHandler = require('./middleware/errorHandler');
 const { apiLimiter } = require('./middleware/rateLimit');
 
@@ -21,25 +18,27 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
-// Initialize Socket.io
-initializeSocket(server);
+// Initialize Socket.io only if enabled
+if (process.env.ENABLE_WEBSOCKETS === 'true') {
+    try {
+        const { initializeSocket } = require('./config/socket');
+        initializeSocket(server);
+        console.log('Socket.io enabled');
+    } catch (err) {
+        console.error('Socket.io initialization failed:', err.message);
+    }
+}
 
 // Body parser
 app.use(express.json());
 
-// Enable CORS with specific origins
-const corsOptions = {
-    origin: [
-        'http://localhost:5173',
-        'http://localhost:3000',
-        'https://flowops-frontend.azurewebsites.net',
-        process.env.FRONTEND_URL
-    ].filter(Boolean),
+// Enable CORS - allow all origins for Azure compatibility
+app.use(cors({
+    origin: true,
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-};
-app.use(cors(corsOptions));
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
 // Apply rate limiting to all API routes
 app.use('/api', apiLimiter);
@@ -52,11 +51,17 @@ if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
 
-// API Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'FlowOps API Documentation'
-}));
+// Swagger API Documentation (optional in production)
+try {
+    const swaggerUi = require('swagger-ui-express');
+    const swaggerSpec = require('./config/swagger');
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+        customCss: '.swagger-ui .topbar { display: none }',
+        customSiteTitle: 'FlowOps API Documentation'
+    }));
+} catch (err) {
+    console.log('Swagger documentation not available');
+}
 
 // Health check
 app.get('/health', (req, res) => {
@@ -85,6 +90,5 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 3001;
 
 server.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-    console.log(`Socket.io enabled for real-time updates`);
+    console.log(`Server running in ${process.env.NODE_ENV || 'production'} mode on port ${PORT}`);
 });
