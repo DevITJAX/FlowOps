@@ -32,6 +32,9 @@ if (process.env.ENABLE_WEBSOCKETS === 'true') {
 // Body parser
 app.use(express.json());
 
+// Trust proxy for Azure/reverse proxy (required for rate limiting)
+app.set('trust proxy', 1);
+
 // Enable CORS - allow all origins for Azure compatibility
 app.use(cors({
     origin: true,
@@ -40,8 +43,10 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-// Apply rate limiting to all API routes
-app.use('/api', apiLimiter);
+// Apply rate limiting to all API routes (skip in production if causing issues)
+if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_RATE_LIMIT === 'true') {
+    app.use('/api', apiLimiter);
+}
 
 // Serve static files for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
