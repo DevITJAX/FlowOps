@@ -1,5 +1,8 @@
 const rateLimit = require('express-rate-limit');
 
+// Skip validation for Azure/reverse proxy environments
+const skipValidation = { xForwardedForHeader: false };
+
 // Rate limiter for authentication routes (stricter)
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -9,7 +12,8 @@ const authLimiter = rateLimit({
         message: 'Too many login attempts. Please try again after 15 minutes.'
     },
     standardHeaders: true,
-    legacyHeaders: false
+    legacyHeaders: false,
+    validate: skipValidation
 });
 
 // Rate limiter for password reset (very strict)
@@ -21,7 +25,8 @@ const passwordResetLimiter = rateLimit({
         message: 'Too many password reset attempts. Please try again after an hour.'
     },
     standardHeaders: true,
-    legacyHeaders: false
+    legacyHeaders: false,
+    validate: skipValidation
 });
 
 // General API rate limiter
@@ -33,7 +38,8 @@ const apiLimiter = rateLimit({
         message: 'Too many requests. Please slow down.'
     },
     standardHeaders: true,
-    legacyHeaders: false
+    legacyHeaders: false,
+    validate: skipValidation
 });
 
 module.exports = {
