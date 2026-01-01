@@ -5,10 +5,10 @@ on:
     branches: [main]
 
 env:
-  ACR_NAME: flowopsacr.azurecr.io
-  BACKEND_IMAGE: flowopsacr.azurecr.io/flowops-backend
-  FRONTEND_IMAGE: flowopsacr.azurecr.io/flowops-frontend
-  BACKEND_URL: https://flowops-backend.azurewebsites.net
+  ACR_NAME: flowopsacr2025.azurecr.io
+  BACKEND_IMAGE: flowopsacr2025.azurecr.io/flowops-backend
+  FRONTEND_IMAGE: flowopsacr2025.azurecr.io/flowops-frontend
+  BACKEND_URL: https://flowops-backend-app.azurewebsites.net
 
 jobs:
   build-and-deploy:
@@ -59,7 +59,7 @@ jobs:
       - name: Deploy Backend to Azure
         uses: azure/webapps-deploy@v3
         with:
-          app-name: flowops-backend
+          app-name: flowops-backend-app
           publish-profile: ${{ secrets.AZURE_BACKEND_PUBLISH_PROFILE }}
           images: ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
 
@@ -67,6 +67,6 @@ jobs:
       - name: Deploy Frontend to Azure
         uses: azure/webapps-deploy@v3
         with:
-          app-name: flowops-frontend
+          app-name: flowops-frontend-app
           publish-profile: ${{ secrets.AZURE_FRONTEND_PUBLISH_PROFILE }}
           images: ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
