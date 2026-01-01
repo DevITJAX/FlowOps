@@ -56,18 +56,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Deploy Backend container to Azure App Service
+      # Deploy Backend container to Azure App Service via Webhook
       - name: Deploy Backend to Azure
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: flowops-backend-app
-          publish-profile: ${{ secrets.AZURE_BACKEND_PUBLISH_PROFILE }}
-          images: ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+        run: curl -X POST "${{ secrets.AZURE_BACKEND_WEBHOOK }}"
 
-      # Deploy Frontend container to Azure App Service  
+      # Deploy Frontend container to Azure App Service via Webhook
       - name: Deploy Frontend to Azure
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: flowops-frontend-app
-          publish-profile: ${{ secrets.AZURE_FRONTEND_PUBLISH_PROFILE }}
-          images: ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+        run: curl -X POST "${{ secrets.AZURE_FRONTEND_WEBHOOK }}"
