@@ -3,6 +3,7 @@ name: CD Pipeline
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 env:
   ACR_NAME: flowopsacr2025.azurecr.io
