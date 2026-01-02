@@ -5,22 +5,34 @@ const API_URL = process.env.API_URL || 'https://flowops-backend.azurewebsites.ne
 async function seedData() {
     console.log('🌱 Seeding FlowOps database...\n');
 
-    // 1. Register test user
-    console.log('1. Creating test user...');
-    try {
-        const registerRes = await fetch(`${API_URL}/auth/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: 'Demo User',
-                email: 'demo@flowops.com',
-                password: 'Demo123!@#'
-            })
-        });
-        const registerData = await registerRes.json();
-        console.log('   User created:', registerData.success ? '✅' : registerData.message || '❌');
-    } catch (e) {
-        console.log('   User might already exist');
+    // 1. Register test users
+    console.log('1. Creating test users...');
+    const users = [
+        { name: 'Demo User', email: 'demo@flowops.com', password: 'Demo123!@#', role: 'admin' },
+        { name: 'Alice Developer', email: 'alice@flowops.com', password: 'Password123!', role: 'developer' },
+        { name: 'Bob Manager', email: 'bob@flowops.com', password: 'Password123!', role: 'manager' },
+        { name: 'Charlie QA', email: 'charlie@flowops.com', password: 'Password123!', role: 'qa' }
+    ];
+
+    const createdUsers = [];
+
+    for (const user of users) {
+        try {
+            const registerRes = await fetch(`${API_URL}/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(user)
+            });
+            const registerData = await registerRes.json();
+            if (registerData.success || registerData.token) {
+                console.log(`   ✅ User created: ${user.name}`);
+                createdUsers.push({ ...user, _id: registerData.user ? registerData.user.id : null });
+            } else {
+                console.log(`   ⚠️ User ${user.name}: ${registerData.message || 'might already exist'}`);
+            }
+        } catch (e) {
+            console.log(`   ❌ Failed to create user ${user.name}: ${e.message}`);
+        }
     }
 
     // 2. Login to get token
@@ -91,6 +103,71 @@ async function seedData() {
         if (existingData.data) {
             createdProjects.push(...existingData.data.slice(0, 3));
         }
+    }
+
+    // 3.5 Create Teams
+    console.log('\n3.5. Creating teams for first project...');
+
+    if (createdProjects.length > 0) {
+        const firstProject = createdProjects[0];
+        const projectId = firstProject._id || firstProject.id;
+
+        const teams = [
+            { name: 'Frontend Team', description: 'Responsible for all UI/UX development', type: 'development' },
+            { name: 'Backend Team', description: 'API and Database management', type: 'development' },
+            { name: 'QA Team', description: 'Quality Assurance and Testing', type: 'qa' }
+        ];
+
+        for (const team of teams) {
+            try {
+                // Create team using project-scoped URL
+                const res = await fetch(`${API_URL}/projects/${projectId}/teams`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(team)
+                });
+                const data = await res.json();
+
+                if (data.success && data.data) {
+                    console.log(`   ✅ Created Team: ${team.name}`);
+                    const teamId = data.data._id;
+
+                    // Add members to team (randomly assign users)
+                    // We need to fetch all users first to get their IDs correctly
+                    const usersRes = await fetch(`${API_URL}/users`, { headers });
+                    const usersData = await usersRes.json();
+                    const allUsers = usersData.data || [];
+
+                    if (allUsers.length > 0) {
+                        // Assign random users to this team
+                        const membersToAdd = allUsers
+                            // .filter(u => u.email !== 'demo@flowops.com') // Optional
+                            .sort(() => 0.5 - Math.random())
+                            .slice(0, 2);
+
+                        for (const member of membersToAdd) {
+                            try {
+                                await fetch(`${API_URL}/teams/${teamId}/members`, {
+                                    method: 'POST',
+                                    headers,
+                                    body: JSON.stringify({ userId: member._id, role: 'member' })
+                                });
+                                console.log(`      👤 Added ${member.name} to ${team.name}`);
+                            } catch (err) {
+                                // Member might already be in team
+                            }
+                        }
+                    }
+
+                } else {
+                    console.log(`   ⚠️ Team ${team.name}: ${data.message || 'might already exist'}`);
+                }
+            } catch (e) {
+                console.log(`   ❌ Failed to create team ${team.name}: ${e.message}`);
+            }
+        }
+    } else {
+        console.log('   ⚠️ No projects available to assign teams to.');
     }
 
     // 4. Create sample tasks for each project
