@@ -5,11 +5,38 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# =============================================================================
+# AZURE DEPLOYMENT CONFIGURATION
+# =============================================================================
+# To deploy this project to your own Azure account, you need to:
+#
+# 1. Create an Azure Container Registry (ACR):
+#    - Go to Azure Portal > Create a Resource > Container Registry
+#    - Note the registry name (e.g., myregistry.azurecr.io)
+#
+# 2. Create two Azure App Services (for backend and frontend):
+#    - Backend: Configure as a container app pulling from your ACR
+#    - Frontend: Configure as a container app pulling from your ACR
+#
+# 3. Configure the following GitHub Secrets in your repository:
+#    - ACR_USERNAME: Your Azure Container Registry username (from ACR > Access keys)
+#    - ACR_PASSWORD: Your Azure Container Registry password (from ACR > Access keys)
+#    - AZURE_BACKEND_WEBHOOK: Backend App Service container webhook URL
+#    - AZURE_FRONTEND_WEBHOOK: Frontend App Service container webhook URL
+#
+# 4. Update the environment variables below with your Azure resource names:
+# =============================================================================
+
 env:
-  ACR_NAME: flowopsacr2025.azurecr.io
-  BACKEND_IMAGE: flowopsacr2025.azurecr.io/flowops-backend
-  FRONTEND_IMAGE: flowopsacr2025.azurecr.io/flowops-frontend
-  BACKEND_URL: https://flowops-backend-app.azurewebsites.net
+  # TODO: Replace with your Azure Container Registry name
+  ACR_NAME: <your-acr-name>.azurecr.io
+  
+  # TODO: Replace with your ACR image paths
+  BACKEND_IMAGE: <your-acr-name>.azurecr.io/flowops-backend
+  FRONTEND_IMAGE: <your-acr-name>.azurecr.io/flowops-frontend
+  
+  # TODO: Replace with your Azure App Service backend URL
+  BACKEND_URL: https://<your-backend-app-name>.azurewebsites.net
 
 jobs:
   build-and-deploy:
